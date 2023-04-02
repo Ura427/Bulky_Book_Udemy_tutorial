@@ -9,6 +9,7 @@
             <h2 class="text-primary">Create Category</h2>
             <hr />
         </div>
+        <div asp-validation-summary="All"> </div>
         <div class="mb-3">
             <label asp-for="Name"></label>
             <input asp-for="Name" class="form-control" />
@@ -19,10 +20,18 @@
             <input asp-for="DisplayOrder" class="form-control" />
             <span asp-validation-for="DisplayOrder" class="text-danger"></span>
         </div>
-        <div class="ps-5">
+        <div>
             <button type="submit" class="btn btn-primary" style="width:150px">Create</button>
             <a asp-controller="Category" asp-action="Index" class="btn btn-secondary" style="width:150px"><i class="bi bi-arrow-left-square"></i> &nbsp; Go back</a>
         </div>
     </div>
 </form>
 
+
+
+@*Page won't reach server unless all necessary data is provided*@
+@section Scripts{
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
