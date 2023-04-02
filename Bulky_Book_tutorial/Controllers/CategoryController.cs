@@ -1,6 +1,7 @@
 ﻿using Bulky_Book_tutorial.Data;
 using Bulky_Book_tutorial.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Bulky_Book_tutorial.Controllers
 {
@@ -35,30 +36,107 @@ namespace Bulky_Book_tutorial.Controllers
         [ValidateAntiForgeryToken]//attribute, that is used to prevent cross-site request forgery (CSRF) attacks.
         public IActionResult Create(Category obj)
         {
-            if (ModelState.IsValid && obj.DisplayOrder > 0 )//Checking if the obj is valid(all required fields are set)
+            #region CustomValidationChecks
+            if (obj.Name == obj.DisplayOrder.ToString())
+            {
+                ModelState.AddModelError("Custom error", "Name and DisplayOrder fields shouldn't be the same");
+            }
+
+            if(_context.Categories.Any(c => c.Name == obj.Name))
+            {
+                ModelState.AddModelError("name", "Category with the same name already exists");
+            }
+
+            if(_context.Categories.Any(x => x.DisplayOrder == obj.DisplayOrder))
+            {
+                ModelState.AddModelError("displayOrder", "Category with the same display order already exists");
+            }
+
+            if(obj.DisplayOrder <= 0)
+            {
+                ModelState.AddModelError("displayOrder", "Display order can't be less than zero");
+            }
+            #endregion
+
+            if (ModelState.IsValid)//Checking if the obj is valid(all required fields are set)
             {
                 _context.Categories.Add(obj);//Adding our object to database
                 _context.SaveChanges();//Saving changes, so object will appear in database
+                TempData["success"] = "Created category successfully"; //Stores temporary data
                 return RedirectToAction("Index");//Going back to Index page
             }
            return View(obj);
         }
 
 
+        //GET
         [HttpGet]
-        public IActionResult Delete() 
+        public IActionResult Edit(int? id)
         {
-            return View();
+            if(id == null || id <= 0) { return NotFound(); }
+
+            var obj = _context.Categories.Find(id);
+            #region Unnecessary
+            //var obj = _context.Categories.FirstOrDefault(c => c.Id == id);
+            //var obj = _context.Categories.SingleOrDefault(c => c.Id == id);
+
+            //if(obj == null)
+            //{
+            //    return NotFound();
+            //}
+            #endregion
+
+            return View(obj);
         }
 
+
+        //POST
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(Category obj)
+        public IActionResult Edit(Category obj)
         {
-            var category = _context.Categories.FirstOrDefault(c => c.Name == obj.Name);//Search an object in database with the same name as our parameter(obj) has 
-            _context.Categories.Remove(category);//Remove category from database
+            #region Unnecessary
+            //if (!(_context.Categories.Any(x => x.Name == obj.Name)))
+            //{
+            //    ModelState.AddModelError("name", "Invalid name");
+            //}
+
+            //if (ModelState.IsValid)
+            //{
+            //    _context.Categories.Update(obj);//Update category in database
+            //    _context.SaveChanges();
+            //    return RedirectToAction("Index");
+            //}
+            //return View(obj);
+            #endregion
+
+            _context.Categories.Update(obj);//Update category in database
             _context.SaveChanges();
+            TempData["success"] = "Edited category successfully";
             return RedirectToAction("Index");
         }
+
+
+
+
+
+        //GET
+        [HttpGet]
+        public IActionResult Delete(int? id) 
+        {
+            if(id == null || id <= 0) { return NotFound();}
+
+            var obj = _context.Categories.Find(id);
+
+            if(obj == null) { return NotFound(); }
+       
+
+            _context.Categories.Remove(obj);
+            _context.SaveChanges();
+            TempData["success"] = "Deleted category successfully";
+            return RedirectToAction("Index");
+        }
+
+
     }
 }
