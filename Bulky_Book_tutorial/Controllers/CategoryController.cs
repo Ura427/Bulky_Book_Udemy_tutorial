@@ -1,5 +1,5 @@
-﻿using Bulky_Book_tutorial.Data;
-using Bulky_Book_tutorial.Models;
+﻿using BulkyBook.DataAccess;
+using BulkyBook.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
