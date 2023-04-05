@@ -9,18 +9,18 @@ namespace Bulky_Book_tutorial.Controllers
     public class CategoryController : Controller
     {
         //Storing our database
-        private readonly ICategoryRepository _context;
+        private readonly IUnitOfWork _unitOfWork;
 
         //Constuctor, that uses dependency injection to initialize _context
-        public CategoryController(ICategoryRepository context)
+        public CategoryController(IUnitOfWork unitOfWork)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
         }
 
         public IActionResult Index()
         {
             //Storing a list of objects of Category type 
-            IEnumerable<Category> objCategoryList = _context.GetAll();
+            IEnumerable<Category> objCategoryList = _unitOfWork.Category.GetAll();
             return View(objCategoryList);
         }
 
@@ -43,12 +43,12 @@ namespace Bulky_Book_tutorial.Controllers
                 ModelState.AddModelError("Custom error", "Name and DisplayOrder fields shouldn't be the same");
             }
 
-            if(_context.GetFirstOrDefault(c => c.Name == obj.Name) != null)
+            if(_unitOfWork.Category.GetFirstOrDefault(c => c.Name == obj.Name) != null)
             {
                 ModelState.AddModelError("name", "Category with the same name already exists");
             }
 
-            if(_context.GetFirstOrDefault(x => x.DisplayOrder == obj.DisplayOrder) != null)
+            if(_unitOfWork.Category.GetFirstOrDefault(x => x.DisplayOrder == obj.DisplayOrder) != null)
             {
                 ModelState.AddModelError("displayOrder", "Category with the same display order already exists");
             }
@@ -61,8 +61,8 @@ namespace Bulky_Book_tutorial.Controllers
 
             if (ModelState.IsValid)//Checking if the obj is valid(all required fields are set)
             {
-                _context.Add(obj);//Adding our object to database
-                _context.Save();//Saving changes, so object will appear in database
+                _unitOfWork.Category.Add(obj);//Adding our object to database
+                _unitOfWork.Save();//Saving changes, so object will appear in database
                 TempData["success"] = "Created category successfully"; //Stores temporary data
                 return RedirectToAction("Index");//Going back to Index page
             }
@@ -76,7 +76,7 @@ namespace Bulky_Book_tutorial.Controllers
         {
             if(id == null || id <= 0) { return NotFound(); }
 
-            var obj = _context.GetFirstOrDefault(c => c.Id == id);
+            var obj = _unitOfWork.Category.GetFirstOrDefault(c => c.Id == id);
 
             #region Unnecessary
             //var obj = _context.Categories.Find(id);
@@ -97,8 +97,8 @@ namespace Bulky_Book_tutorial.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Category obj)
         {
-            _context.Update(obj);//Update category in database
-            _context.Save();
+            _unitOfWork.Category.Update(obj);//Update category in database
+            _unitOfWork.Save();
             TempData["success"] = "Edited category successfully";
             return RedirectToAction("Index");
         }
@@ -113,13 +113,13 @@ namespace Bulky_Book_tutorial.Controllers
         {
             if(id == null || id <= 0) { return NotFound();}
 
-            var obj = _context.GetFirstOrDefault(i => i.Id == id);
+            var obj = _unitOfWork.Category.GetFirstOrDefault(i => i.Id == id);
 
             if(obj == null) { return NotFound(); }
        
 
-            _context.Remove(obj);
-            _context.Save();
+            _unitOfWork.Category.Remove(obj);
+            _unitOfWork.Save();
             TempData["success"] = "Deleted category successfully";
             return RedirectToAction("Index");
         }
