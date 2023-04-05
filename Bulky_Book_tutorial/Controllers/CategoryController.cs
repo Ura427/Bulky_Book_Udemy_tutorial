@@ -95,21 +95,6 @@ namespace Bulky_Book_tutorial.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Category obj)
         {
-            #region Unnecessary
-            //if (!(_context.Categories.Any(x => x.Name == obj.Name)))
-            //{
-            //    ModelState.AddModelError("name", "Invalid name");
-            //}
-
-            //if (ModelState.IsValid)
-            //{
-            //    _context.Categories.Update(obj);//Update category in database
-            //    _context.SaveChanges();
-            //    return RedirectToAction("Index");
-            //}
-            //return View(obj);
-            #endregion
-
             _context.Categories.Update(obj);//Update category in database
             _context.SaveChanges();
             TempData["success"] = "Edited category successfully";
