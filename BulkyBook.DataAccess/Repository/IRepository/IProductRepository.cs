@@ -1,0 +1,10 @@
+﻿using BulkyBook.Models;
+using BulkyBook.Repository.IRepository;
+
+namespace BulkyBook.DataAccess.Repository.IRepository
+{
+    public interface IProductRepository : IRepository<Product>
+    {
+        void Update(Product obj);
+    }
+}
